@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/boot.php';
 
-if (!check_auth()) {
+if (check_auth()) {
     header('Location: /');
     die;
 }

@@ -10,7 +10,7 @@ if ($stmt->rowCount() > 0) {
     die;
 }
 
-$stmt = pdo()->prepare("INSERT INTO `users` (`username`, `password`) VALUES (:username, :password)");
+$stmt = pdo()->prepare("INSERT INTO `users` (`username`, `password`,`admFlag`) VALUES (:username, :password,0)");
 $stmt->execute([
     'username' => $_POST['username'],
     'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
