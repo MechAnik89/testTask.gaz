@@ -2,7 +2,6 @@
 
 require_once __DIR__.'/boot.php';
 
-// Проверяем наличие пользователя с указанным юзернеймом
 $stmt = pdo()->prepare("SELECT * FROM `users` WHERE `username` = :username");
 $stmt->execute(['username' => $_POST['username']]);
 if (!$stmt->rowCount()) {
@@ -12,11 +11,7 @@ if (!$stmt->rowCount()) {
 }
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Проверяем пароль
 if (password_verify($_POST['password'], $user['password'])) {
-    // Проверяем, не нужно ли использовать более новый алгоритм
-    // или другую алгоритмическую стоимость
-    // Например, если вы поменяете опции хеширования
     if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
         $newHash = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $stmt = pdo()->prepare('UPDATE `users` SET `password` = :password WHERE `username` = :username');

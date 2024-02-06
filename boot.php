@@ -1,8 +1,23 @@
 <?php
-
-// Инициализируем сессию
+$config = include __DIR__ . '/config.php';
 session_start();
-
+$connection = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
+mysqli_select_db($connection, $config['db_name']);
+$query = "SELECT * FROM passes";
+$result = mysqli_query($connection, $query);
+while ($row = mysqli_fetch_array($result)) {
+    $datetimeFrom = $row['timeFrom'];
+    $datetime = new DateTime($datetimeFrom);
+    $datetime->modify('+10 hours');
+    $datetimeNow = new DateTime();
+    if(!($datetime>$datetimeNow) and ($row['pass'] == 1)){
+        $query = "UPDATE passes SET pass = 2 WHERE id = ".$row['id'];
+        mysqli_query($connection,$query);
+    }elseif(($datetime>$datetimeNow) and ($row['pass'] != 1)){
+        $query = "UPDATE passes SET pass = 0 WHERE id = ".$row['id'];
+        mysqli_query($connection,$query);
+    }
+}
 // Простой способ сделать глобально доступным подключение в БД
 function pdo(): PDO
 {

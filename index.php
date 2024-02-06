@@ -36,6 +36,18 @@ if (check_auth()) {
                     <form class="mt-5" method="post" action="passes.php">
                         <button type="submit" class="btn btn-primary">Заявки</button>
                     </form>
+                    <?php if($admFlag){?>
+                    <form class="mt-5" method="post" action="account.php">
+                        <button type="submit" class="btn btn-primary">Аккаунт</button>
+                    </form>
+                    <form class="mt-5" method="post" action="users.php">
+                        <button type="submit" class="btn btn-primary">Пользователи</button>
+                    </form>
+                    <?php }else{ ?>
+                    <form class="mt-5" method="post" action="account.php">
+                        <button type="submit" class="btn btn-primary">Аккаунт</button>
+                    </form>
+                        <?php } ?>
                     <form class="mt-5" method="post" action="do_logout.php">
                         <button type="submit" class="btn btn-primary">Выйти</button>
                     </form>
