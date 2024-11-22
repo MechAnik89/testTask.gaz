@@ -44,6 +44,13 @@ if (check_auth()) {
         </div>
     </div>
 </div>
-
+<script>
+    document.getElementById('loginForm').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Предотвращаем стандартное действие, если это необходимо
+            document.getElementById('loginButton').click();
+        }
+    });
+</script>
 </body>
 </html>

@@ -49,11 +49,21 @@ if (check_auth()) {
                     </form>
                         <?php } ?>
                     <form class="mt-5" method="post" action="do_logout.php">
-                        <button type="submit" class="btn btn-primary">Выйти</button>
+                        <button type="submit" class="btn btn-primary" id="logoutButton">Выйти</button>
                     </form>
                 </div>
-
-
+                <script>
+                    // Обработка нажатия клавиши "Esc"
+                    document.addEventListener('keydown', function(event) {
+                        if (event.key === 'Escape') { // Проверяем, что нажата именно клавиша "Esc"
+                            event.preventDefault(); // Предотвращаем стандартное поведение
+                            const logoutButton = document.getElementById('logoutButton');
+                            if (logoutButton) {
+                                logoutButton.click(); // Программно вызываем событие "нажатия"
+                            }
+                        }
+                    });
+                </script>
             <?php } else { ?>
 
                 <h1 class="mb-5">Регистрация</h1>

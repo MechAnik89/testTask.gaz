@@ -22,7 +22,7 @@ if (check_auth()) {
     header('Location: /');
     die;
 }
-if (isset($_GET['action']) && isset($_GET['id']) && ($admFlag == True)) {
+if (isset($_GET['action']) && isset($_GET['id']) && $admFlag) {
     $action = $_GET['action'];
     $id = $_GET['id'];
 
@@ -31,17 +31,22 @@ if (isset($_GET['action']) && isset($_GET['id']) && ($admFlag == True)) {
         mysqli_select_db($connection, $config['db_name']);
         $request = mysqli_query($connection, "SELECT * FROM `passes` WHERE `id` = $id");
         $pullR = mysqli_fetch_array($request);
-        $datetimeFrom = $pullR['timeFrom'];
+        $datetimeFrom = $pullR['timeFromLab'];
         $datetime = new DateTime($datetimeFrom);
         $datetime->modify('+10 hours');
         $formattedDatetime = $datetime->format('Y-m-d H:i:s');
-        $query = "UPDATE `passes` SET `timeTo` = '$formattedDatetime', `pass` = 1 WHERE `passes`.`id` = $id";
+        $query = "UPDATE `passes` SET `timeToLab` = '$formattedDatetime', `pass` = 1 WHERE `passes`.`id` = $id";
         $result = mysqli_query($connection, $query);
+        flash($query);
     } elseif ($action == 'reject') {
         $connection = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
         mysqli_select_db($connection, $config['db_name']);
-        $query = "UPDATE `passes` SET `timeTo` = null, `pass` = 0 WHERE `passes`.`id` = $id";
+        $query = "UPDATE `passes` SET `timeToLab` = null, `pass` = 0 WHERE `passes`.`id` = $id";
         $result = mysqli_query($connection, $query);
+    }
+    else{
+        flash("!!!!!!!!!!");
+
     }
 
     header('Location: passes.php');

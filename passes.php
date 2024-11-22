@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__.'/boot.php';
-
 $user = null;
 $admFlag = false;
 if (check_auth()) {
@@ -65,9 +64,9 @@ if (check_auth()) {
                             $row['pass'] = 'Не одобрен';}
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['typeVeh']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timeFrom']) . "</td>";
-                        echo "<td>" . $row['timeTo'] . "</td>";
+                        echo "<td>" . htmlspecialchars($row['typeVehLab']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['timeFromLab']) . "</td>";
+                        echo "<td>" . $row['timeToLab'] . "</td>";
                         echo "<td>" . htmlspecialchars($row['pass']) . "</td>";
                         echo "<td>";
                         $idshka = $row['id'];
@@ -95,11 +94,12 @@ if (check_auth()) {
                     <?php
                     $connection = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
                     mysqli_select_db($connection, $config['db_name']);
-                    $query = "SELECT * FROM passes WHERE idUsers =" . $user['id'];
+                    $query = "SELECT * FROM passes WHERE user_id =" . $user['id'];
                     $result = mysqli_query($connection, $query);
                     echo "<table class='table table-bordered table-hover'>";
                     echo "<thead><tr><th>Номер заявки</th><th>Автомобиль</th><th>Дата подачи</th><th>Дата завершения</th><th>Разрешение</th><th>Пропуск</th></tr></thead>";
                     echo "<tbody>";
+                    if($result){
                     while ($row = mysqli_fetch_array($result)) {
                         if($row['pass'] == 1){
                             $row['pass'] = 'Одобрен';
@@ -126,12 +126,26 @@ if (check_auth()) {
                     }
                     echo "</tbody>";
                     echo "</table>";
+                    }
                     ?>
                 </div>
             <?php } else { ?>
                 <?php flash(); ?>
             <?php } ?>
-            <a class="btn btn-outline-primary" href="/index.php">Назад</a>
+            <a class="btn btn-outline-primary" href="/index.php" id = "back">Назад</a>
+
+            <script>
+                // Обработка нажатия клавиши "Esc"
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') { // Проверяем, что нажата именно клавиша "Esc"
+                        event.preventDefault(); // Предотвращаем стандартное поведение
+                        const backButton = document.getElementById('back');
+                        if (backButton) {
+                            backButton.click(); // Программно вызываем событие "нажатия"
+                        }
+                    }
+                });
+            </script>
         </div>
     </div>
 </div>

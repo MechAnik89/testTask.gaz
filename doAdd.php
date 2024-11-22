@@ -25,15 +25,15 @@ $id1 = $user['id'];
 $datetime = new DateTime($datetimeValue);
 $formattedDatetime = $datetime->format('Y-m-d H:i:s');
 
-$query = "INSERT INTO passes (idUsers, typeVeh, timeFrom,pass)
-            VALUES ('$id1', '$typeVeh1','$formattedDatetime',0)";
+$query = "INSERT INTO passes (user_id, typeVehLab, timeFromLab,pass) VALUES ('$id1', '$typeVeh1','$formattedDatetime',0)";
 $sql = mysqli_query($connection,$query);
 if($sql){
 flash('Успешно!');
-header('Location: /addPass.php');
+header('Location: /passes.php');
 die;}
 else{
-    flash('Ошибка!');
+    $error = mysqli_error($connection); // Получение текста ошибки SQL
+    flash('Ошибка! ' . $error); // Вывод текста ошибки в flash
     header('Location: /addPass.php');
     die;
 }
