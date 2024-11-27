@@ -69,7 +69,6 @@ if (check_auth()) {
                         echo "<td>" . $row['timeToLab'] . "</td>";
                         echo "<td>" . htmlspecialchars($row['pass']) . "</td>";
                         echo "<td>";
-                        $idshka = $row['id'];
                         if ($row['pass'] == 'Одобрен') {
                             echo '<form action="doPass.php" method="POST">';?>
                             <a href="doPass.php?action=reject&id=<?php echo $row['id']; ?>" class="btn btn-danger">Отклонить</a>
@@ -118,7 +117,7 @@ if (check_auth()) {
                             echo '<form action="pass.php" method="POST">';?>
                             <a href="pass.php?action=reject&id=<?php echo $row['id']; ?>" class="btn btn-danger">Открыть</a>
                             <?php echo '</form>';
-                        } elseif ($row['pass'] == 'Не одобрен' or $row['pass'] == 'Просрочен') {
+                        } else{
                             echo '';
                         }
                         echo "</td>";
