@@ -80,7 +80,7 @@ if (check_auth()) {
                         <td><?= htmlspecialchars($row['id']) ?></td>
                         <td><?= htmlspecialchars($row['typeVehLab']) ?></td>
                         <td><?= htmlspecialchars($row['timeFromLab']) ?></td>
-                        <td><?= htmlspecialchars($row['timeToLab']) ?></td>
+                        <td><?= htmlspecialchars($row['timeToLab'] === null ? '' : $row['timeToLab']) ?></td>
                         <td><?= $status ?></td>
                         <td>
                             <?php if ($status == 'Одобрен') { ?>
