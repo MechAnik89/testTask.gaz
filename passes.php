@@ -1,26 +1,17 @@
 <?php
 require_once __DIR__.'/boot.php';
+
 $user = null;
 $admFlag = false;
+
 if (check_auth()) {
-    // Получим данные пользователя по сохранённому идентификатору
-    if (file_exists(__DIR__ . '/config.php')) {
-        $config = include __DIR__.'/config.php';
-    } else {
-        $msg = 'Создайте и настройте config.php на основе config.sample.php';
-        trigger_error($msg, E_USER_ERROR);
-    }
     $stmt = pdo()->prepare("SELECT * FROM `users` WHERE `id` = :id");
     $stmt->execute(['id' => $_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    if($user['admFlag']){
-        $admFlag = True;
-    }else{
-        $admFlag = False;
-    }
-}else{
+    $admFlag = !empty($user['admFlag']);
+} else {
     header('Location: /');
-    die;
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -34,119 +25,119 @@ if (check_auth()) {
         body {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            padding-top: 50px;
+            background-color: #f8f9fa;
+        }
+        .container-main {
+            width: 100%;
+            max-width: 900px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            margin-bottom: 10px;
+        }
+        table {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-<div class="container mx-auto">
-    <div class="row">
-        <div class="col-lg-6">
-            <?php if ($user && $admFlag) { ?>
-                <h1 class="mb-4">Заявки</h1>
-                <div class="container-fluid" id="passesList">
-                    <?php
-                    $connection = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
-                    mysqli_select_db($connection, $config['db_name']);
-                    $query = "SELECT * FROM passes";
-                    $result = mysqli_query($connection, $query);
-                    echo "<table class='table table-bordered table-hover'>";
-                    echo "<thead><tr><th>Номер заявки</th><th>Автомобиль</th><th>Дата подачи</th><th>Дата завершения</th><th>Разрешение</th><th>Действие</th></tr></thead>";
-                    echo "<tbody>";
-                    while ($row = mysqli_fetch_array($result)) {
-                        if($row['pass'] == 1){
-                            $row['pass'] = 'Одобрен';}
-                        elseif($row['pass'] == 2){
-                            $row['pass'] = 'Просрочен';
-                        } else {
-                            $row['pass'] = 'Не одобрен';}
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['typeVehLab']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timeFromLab']) . "</td>";
-                        echo "<td>" . $row['timeToLab'] . "</td>";
-                        echo "<td>" . htmlspecialchars($row['pass']) . "</td>";
-                        echo "<td>";
-                        if ($row['pass'] == 'Одобрен') {
-                            echo '<form action="doPass.php" method="POST">';?>
-                            <a href="doPass.php?action=reject&id=<?php echo $row['id']; ?>" class="btn btn-danger">Отклонить</a>
-                            <?php echo '</form>';
-                        } elseif ($row['pass'] == 'Не одобрен') {
-                            echo '<form action="doPass.php" method="POST">';?>
-                            <a href="doPass.php?action=approve&id=<?php echo $row['id']; ?>" class="btn btn-success">Подтвердить</a>                            <?php echo '</form>';
-                        }else{
-                            echo '';
-                        }
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                    echo "</tbody>";
-                    echo "</table>";
-                    ?>
-                </div>
-            <?php } elseif ($user && !$admFlag) { ?>
-                <h1 class="mb-4">Заявки</h1>
-                <a class="btn btn-outline-primary mb-3" href="addPass.php">Новая заявка</a>
-                <div class="mb-3" id="passesList">
-                    <?php
-                    $connection = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
-                    mysqli_select_db($connection, $config['db_name']);
-                    $query = "SELECT * FROM passes WHERE user_id =" . $user['id'];
-                    $result = mysqli_query($connection, $query);
-                    echo "<table class='table table-bordered table-hover'>";
-                    echo "<thead><tr><th>Номер заявки</th><th>Автомобиль</th><th>Дата подачи</th><th>Дата завершения</th><th>Разрешение</th><th>Пропуск</th></tr></thead>";
-                    echo "<tbody>";
-                    if($result){
-                    while ($row = mysqli_fetch_array($result)) {
-                        if($row['pass'] == 1){
-                            $row['pass'] = 'Одобрен';
-                        }elseif($row['pass'] == 2){
-                            $row['pass'] = 'Просрочен';
-                        }else {
-                            $row['pass'] = 'Не одобрен';}
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['typeVeh']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timeFrom']) . "</td>";
-                        echo "<td>" . $row['timeTo'] . "</td>";
-                        echo "<td>" . htmlspecialchars($row['pass']) . "</td>";
-                        echo "<td>";
-                        if ($row['pass'] == 'Одобрен') {
-                            echo '<form action="pass.php" method="POST">';?>
-                            <a href="pass.php?action=reject&id=<?php echo $row['id']; ?>" class="btn btn-danger">Открыть</a>
-                            <?php echo '</form>';
-                        } else{
-                            echo '';
-                        }
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                    echo "</tbody>";
-                    echo "</table>";
-                    }
-                    ?>
-                </div>
-            <?php } else { ?>
-                <?php flash(); ?>
-            <?php } ?>
-            <a class="btn btn-outline-primary" href="/index.php" id = "back">Назад</a>
+<div class="container-main">
+    <?php if ($user) { ?>
+        <h1>Заявки</h1>
 
-            <script>
-                // Обработка нажатия клавиши "Esc"
-                document.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape') { // Проверяем, что нажата именно клавиша "Esc"
-                        event.preventDefault(); // Предотвращаем стандартное поведение
-                        const backButton = document.getElementById('back');
-                        if (backButton) {
-                            backButton.click(); // Программно вызываем событие "нажатия"
-                        }
-                    }
-                });
-            </script>
-        </div>
-    </div>
+        <?php if ($admFlag) {
+            $connection = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
+            mysqli_select_db($connection, $config['db_name']);
+            $query = "SELECT * FROM passes";
+            $result = mysqli_query($connection, $query);
+            ?>
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Номер заявки</th>
+                    <th>Автомобиль</th>
+                    <th>Дата подачи</th>
+                    <th>Дата завершения</th>
+                    <th>Разрешение</th>
+                    <th>Действие</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php while ($row = mysqli_fetch_array($result)) {
+                    $status = $row['pass'] == 1 ? 'Одобрен' : ($row['pass'] == 2 ? 'Просрочен' : 'Не одобрен'); ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
+                        <td><?= htmlspecialchars($row['typeVehLab']) ?></td>
+                        <td><?= htmlspecialchars($row['timeFromLab']) ?></td>
+                        <td><?= htmlspecialchars($row['timeToLab']) ?></td>
+                        <td><?= $status ?></td>
+                        <td>
+                            <?php if ($status == 'Одобрен') { ?>
+                                <a href="doPass.php?action=reject&id=<?= $row['id'] ?>" class="btn btn-danger btn-sm">Отклонить</a>
+                            <?php } elseif ($status == 'Не одобрен') { ?>
+                                <a href="doPass.php?action=approve&id=<?= $row['id'] ?>" class="btn btn-success btn-sm">Подтвердить</a>
+                            <?php } ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+
+        <?php } else {
+            $connection = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
+            mysqli_select_db($connection, $config['db_name']);
+            $query = "SELECT * FROM passes WHERE idUsers =" . $user['id'];
+            $result = mysqli_query($connection, $query); ?>
+
+            <a class="btn btn-outline-primary w-100" href="addPass.php">Новая заявка</a>
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Номер заявки</th>
+                    <th>Автомобиль</th>
+                    <th>Дата подачи</th>
+                    <th>Дата завершения</th>
+                    <th>Разрешение</th>
+                    <th>Пропуск</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php while ($row = mysqli_fetch_array($result)) {
+                    $status = $row['pass'] == 1 ? 'Одобрен' : ($row['pass'] == 2 ? 'Просрочен' : 'Не одобрен'); ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
+                        <td><?= htmlspecialchars($row['typeVehLab']) ?></td>
+                        <td><?= htmlspecialchars($row['timeFromLab']) ?></td>
+                        <td><?= htmlspecialchars($row['timeToLab']) ?></td>
+                        <td><?= $status ?></td>
+                        <td>
+                            <?php if ($status == 'Одобрен') { ?>
+                                <a href="pass.php?action=reject&id=<?= $row['id'] ?>" class="btn btn-danger btn-sm">Открыть</a>
+                            <?php } ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        <?php } ?>
+
+        <a href="index.php" class="btn btn-outline-primary w-100 mt-3">Назад</a>
+
+    <?php } else { ?>
+        <?php flash(); ?>
+    <?php } ?>
 </div>
 </body>
 </html>

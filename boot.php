@@ -6,7 +6,7 @@ mysqli_select_db($connection, $config['db_name']);
 $query = "SELECT * FROM passes";
 $result = mysqli_query($connection, $query);
 while ($row = mysqli_fetch_array($result)) {
-    $datetimeFrom = $row['timeFrom'];
+    $datetimeFrom = $row['timeFromLab'];
     $datetime = new DateTime($datetimeFrom);
     $datetime->modify('+10 hours');
     $datetimeNow = new DateTime();
